@@ -5,9 +5,13 @@ public class Weapon : MonoBehaviour {
 
 	public float fireRate = 0f;
 	public float damage = 10f;
+	public float bulletTrailSpawnRate = 10;
+	public bool showRayTrace = false;
 	public LayerMask whatToHit;
+	public Transform bulletTrailPrefab;
 
 	private float timeToFire = 0f;
+	private float timeToSpawnBulletTrail = 0;
 	private Transform firePoint;
 
 	void Awake() {
@@ -44,11 +48,28 @@ public class Weapon : MonoBehaviour {
 		Vector2 firePointPosition = new Vector2 (firePoint.position.x, firePoint.position.y);
 
 		RaycastHit2D hit = Physics2D.Raycast (firePointPosition, mousePosition - firePointPosition, 100, whatToHit);
-		Debug.DrawLine (firePointPosition, (mousePosition - firePointPosition) * 100);
+
+		if (Time.time >= timeToSpawnBulletTrail) {
+			CreateBulletTrail ();
+			timeToSpawnBulletTrail = Time.time + 1 / bulletTrailSpawnRate;
+		}
+
+		if (showRayTrace) {
+			Debug.DrawLine (firePointPosition, (mousePosition - firePointPosition) * 100);
+		}
 
 		if (hit.collider != null) {
-			Debug.DrawLine (firePointPosition, hit.point, Color.red);
+
+			if (showRayTrace) {
+				Debug.DrawLine (firePointPosition, hit.point, Color.red);
+			}
+
 			Debug.Log ("We hit" + hit.collider.name + " and we did " + damage + " damage");
 		}
+	}
+
+	void CreateBulletTrail() {
+		Instantiate (bulletTrailPrefab, firePoint.position, firePoint.rotation);
+		bulletTrailPrefab.GetComponent<LineRenderer>().sortingLayerName = "Player";
 	}
 }
