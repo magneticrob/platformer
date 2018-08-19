@@ -9,6 +9,7 @@ public class Weapon : MonoBehaviour {
 	public bool showRayTrace = false;
 	public LayerMask whatToHit;
 	public Transform bulletTrailPrefab;
+	public Transform muzzleFlashPrefab;
 
 	private float timeToFire = 0f;
 	private float timeToSpawnBulletTrail = 0;
@@ -71,5 +72,12 @@ public class Weapon : MonoBehaviour {
 	void CreateBulletTrail() {
 		Instantiate (bulletTrailPrefab, firePoint.position, firePoint.rotation);
 		bulletTrailPrefab.GetComponent<LineRenderer>().sortingLayerName = "Player";
+
+		Transform muzzleFlash = Instantiate (muzzleFlashPrefab, firePoint.position, firePoint.rotation) as Transform;
+		muzzleFlash.GetComponent<SpriteRenderer>().sortingLayerName = "Player";
+		muzzleFlash.parent = firePoint;
+		float size = Random.Range (0.6f, 0.9f);
+		muzzleFlash.localScale = new Vector3 (size, size, size);
+		Destroy (muzzleFlash.gameObject, 0.02f);
 	}
 }
